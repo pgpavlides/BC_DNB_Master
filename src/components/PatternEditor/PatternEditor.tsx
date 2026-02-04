@@ -3,6 +3,7 @@ import { useStore } from '../../store';
 import { audioEngine } from '../../audio/AudioEngine';
 import { EDITOR_PAD_ORDER } from '../../utils/step-grid';
 import { patternToMidi } from '../../utils/midi-export';
+import { midiToPattern } from '../../utils/midi-import';
 import type { Pattern } from '../../types/pattern';
 import { StepGrid } from './StepGrid';
 import styles from './PatternEditor.module.css';
@@ -207,5 +208,31 @@ export function useEditorActions() {
     URL.revokeObjectURL(url);
   }, [editorBuildPattern, bpm]);
 
-  return { handlePlay, handleStop, handleSave, handleExportMidi, isPlaying };
+  const editorLoadPattern = useStore((s) => s.editorLoadPattern);
+  const setBpm = useStore((s) => s.setBpm);
+  const setBeatsPerMeasure = useStore((s) => s.setBeatsPerMeasure);
+  const setBeatNoteValue = useStore((s) => s.setBeatNoteValue);
+
+  const handleImportMidi = useCallback(() => {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '.mid,.midi';
+    input.onchange = () => {
+      const file = input.files?.[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = () => {
+        const bytes = new Uint8Array(reader.result as ArrayBuffer);
+        const pattern = midiToPattern(bytes, file.name);
+        editorLoadPattern(pattern);
+        setBpm(pattern.bpm);
+        setBeatsPerMeasure(pattern.timeSignature[0]);
+        setBeatNoteValue(pattern.timeSignature[1]);
+      };
+      reader.readAsArrayBuffer(file);
+    };
+    input.click();
+  }, [editorLoadPattern, setBpm, setBeatsPerMeasure, setBeatNoteValue]);
+
+  return { handlePlay, handleStop, handleSave, handleExportMidi, handleImportMidi, isPlaying };
 }

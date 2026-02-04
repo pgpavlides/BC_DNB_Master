@@ -72,7 +72,8 @@
 
 .clearBtn,
 .saveBtn,
-.exportBtn {
+.exportBtn,
+.importBtn {
   flex: 1;
   padding: 7px 0;
   border: none;
@@ -95,7 +96,8 @@
   border: 1px solid rgba(46, 204, 113, 0.3);
 }
 
-.exportBtn {
+.exportBtn,
+.importBtn {
   background: rgba(52, 152, 219, 0.2);
   color: #3498db;
   border: 1px solid rgba(52, 152, 219, 0.3);
@@ -103,7 +105,8 @@
 
 .clearBtn:hover,
 .saveBtn:hover,
-.exportBtn:hover {
+.exportBtn:hover,
+.importBtn:hover {
   opacity: 0.85;
   transform: scale(1.02);
 }
