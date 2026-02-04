@@ -31,7 +31,7 @@
 
 .pad:active,
 .padActive {
-  transform: scale(0.94);
+  transform: scale(0.97);
 }
 
 .padActive::before {

@@ -11,13 +11,16 @@ import type { PatternSlice } from './patternSlice';
 import { createPatternSlice } from './patternSlice';
 import type { PracticeSlice } from './practiceSlice';
 import { createPracticeSlice } from './practiceSlice';
+import type { EditorSlice } from './editorSlice';
+import { createEditorSlice } from './editorSlice';
 
 export type AppStore = AudioSlice &
   PadSlice &
   MetronomeSlice &
   ModeSlice &
   PatternSlice &
-  PracticeSlice;
+  PracticeSlice &
+  EditorSlice;
 
 export const useStore = create<AppStore>()((...a) => ({
   ...createAudioSlice(...a),
@@ -26,4 +29,5 @@ export const useStore = create<AppStore>()((...a) => ({
   ...createModeSlice(...a),
   ...createPatternSlice(...a),
   ...createPracticeSlice(...a),
+  ...createEditorSlice(...a),
 }));

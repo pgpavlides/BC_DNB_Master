@@ -1,6 +1,6 @@
 import type { StateCreator } from 'zustand';
 
-export type AppMode = 'free-play' | 'learn' | 'practice';
+export type AppMode = 'free-play' | 'learn' | 'practice' | 'pattern';
 
 export interface ModeSlice {
   mode: AppMode;

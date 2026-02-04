@@ -103,12 +103,11 @@ getPattern(): Pattern | null {
 
   dispose(): void {
     if (this.part) {
-      this.part.stop();
-      this.part.dispose();
+      try { this.part.stop(0); } catch { /* Tone.js can throw on tiny negative transport times */ }
+      try { this.part.dispose(); } catch { /* safe cleanup */ }
       this.part = null;
     }
     this.pattern = null;
     this.onEventCallback = null;
-    // reset
   }
 }

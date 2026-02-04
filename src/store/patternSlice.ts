@@ -10,6 +10,8 @@ export interface PatternSlice {
   selectPattern: (pattern: Pattern) => void;
   setPatternPlaying: (playing: boolean) => void;
   setCurrentStep: (step: number) => void;
+  addPattern: (pattern: Pattern) => void;
+  updatePattern: (pattern: Pattern) => void;
 }
 
 export const createPatternSlice: StateCreator<PatternSlice> = (set) => ({
@@ -21,4 +23,10 @@ export const createPatternSlice: StateCreator<PatternSlice> = (set) => ({
   setPatternPlaying: (playing) =>
     set({ isPatternPlaying: playing, currentStep: playing ? 0 : -1 }),
   setCurrentStep: (step) => set({ currentStep: step }),
+  addPattern: (pattern) =>
+    set((state) => ({ patterns: [...state.patterns, pattern] })),
+  updatePattern: (pattern) =>
+    set((state) => ({
+      patterns: state.patterns.map((p) => (p.id === pattern.id ? pattern : p)),
+    })),
 });

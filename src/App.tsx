@@ -6,10 +6,15 @@ import { PatternTimeline } from './components/PatternDisplay/PatternTimeline';
 import { PatternLibrary } from './components/PatternLibrary/PatternLibrary';
 import { PracticePanel } from './components/Practice/PracticePanel';
 import { TimingFeedback } from './components/Practice/TimingFeedback';
+import { PatternEditor, useEditorActions } from './components/PatternEditor/PatternEditor';
+import { EditorControls } from './components/PatternEditor/EditorControls';
+import { PatternLoaderModal } from './components/PatternEditor/PatternLoaderModal';
 import styles from './components/Layout/Layout.module.css';
 
 export default function App() {
   const mode = useStore((s) => s.mode);
+  const editorLoaderOpen = useStore((s) => s.editorLoaderOpen);
+  const editorActions = useEditorActions();
 
   return (
     <div className={styles.app}>
@@ -38,6 +43,18 @@ export default function App() {
             <MetronomeControls />
           </div>
 
+          {mode === 'pattern' && (
+            <div className={styles.sidebarSectionFill}>
+              <div className={styles.sidebarTitle}>Pattern Editor</div>
+              <EditorControls
+                onPlay={editorActions.handlePlay}
+                onStop={editorActions.handleStop}
+                onSave={editorActions.handleSave}
+                isPlaying={editorActions.isPlaying}
+              />
+            </div>
+          )}
+
           {(mode === 'learn' || mode === 'practice') && (
             <div className={styles.sidebarSection}>
               <div className={styles.sidebarTitle}>Patterns</div>
@@ -47,17 +64,24 @@ export default function App() {
         </aside>
 
         <main className={styles.main}>
-          <div className={styles.mainContent}>
-            <PadGrid />
+          {mode === 'pattern' ? (
+            <div className={styles.mainContentFull}>
+              <PatternEditor />
+            </div>
+          ) : (
+            <div className={styles.mainContent}>
+              <PadGrid />
 
-            {(mode === 'learn' || mode === 'practice') && <PatternTimeline />}
+              {(mode === 'learn' || mode === 'practice') && <PatternTimeline />}
 
-            {mode === 'practice' && <PracticePanel />}
-          </div>
+              {mode === 'practice' && <PracticePanel />}
+            </div>
+          )}
         </main>
       </div>
 
       {mode === 'practice' && <TimingFeedback />}
+      {mode === 'pattern' && editorLoaderOpen && <PatternLoaderModal />}
     </div>
   );
 }

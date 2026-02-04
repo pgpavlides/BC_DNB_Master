@@ -19,12 +19,19 @@ class AudioEngine {
   private patternPlayer: PatternPlayer | null = null;
   private initialized = false;
   private _isPlaying = false;
+  private rawCtx: AudioContext | null = null;
+  private bufferCache: Map<number, AudioBuffer> = new Map();
 
   async init(): Promise<void> {
     if (this.initialized) return;
 
+    // Create a low-latency AudioContext and hand it to Tone.js
+    this.rawCtx = new AudioContext({ latencyHint: 'interactive', sampleRate: 44100 });
+    await this.rawCtx.resume();
+
     const T = await getTone();
-    await T.start();
+    T.setContext(this.rawCtx);
+    T.getContext().lookAhead = 0;
 
     // Dynamic imports so Tone.js module-level code only runs after user gesture
     const { SampleLoader } = await import('./SampleLoader');
@@ -36,6 +43,15 @@ class AudioEngine {
     this.patternPlayer = new PatternPlayer();
 
     await this.sampleLoader.load();
+
+    // Pre-cache raw AudioBuffers so triggerPad has zero overhead
+    for (const [padId, player] of this.sampleLoader.getAllPlayers()) {
+      if (player.buffer.loaded) {
+        const buf = player.buffer.get() as AudioBuffer;
+        if (buf) this.bufferCache.set(padId, buf);
+      }
+    }
+
     this.initialized = true;
   }
 
@@ -44,11 +60,14 @@ class AudioEngine {
   }
 
   triggerPad(padId: number): void {
-    const player = this.sampleLoader?.getPlayer(padId);
-    if (player) {
-      player.stop();
-      player.start();
-    }
+    const buf = this.bufferCache.get(padId);
+    if (!buf || !this.rawCtx) return;
+
+    // Pure Web Audio API — no Tone.js in the hot path
+    const source = this.rawCtx.createBufferSource();
+    source.buffer = buf;
+    source.connect(this.rawCtx.destination);
+    source.start();
   }
 
   // Metronome
@@ -96,9 +115,9 @@ class AudioEngine {
 
   stopPattern(): void {
     if (!Tone) return;
-    this.patternPlayer?.stop();
     Tone.getTransport().stop();
     Tone.getTransport().position = 0;
+    try { this.patternPlayer?.stop(); } catch { /* guard Tone.js range errors */ }
     this._isPlaying = false;
   }
 

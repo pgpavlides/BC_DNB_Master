@@ -37,6 +37,10 @@ export class SampleLoader {
     return this.players.get(padId);
   }
 
+  getAllPlayers(): Map<number, Tone.Player> {
+    return this.players;
+  }
+
   isLoaded(): boolean {
     return this.loaded;
   }

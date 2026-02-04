@@ -8,6 +8,7 @@ const MODES: { id: AppMode; label: string }[] = [
   { id: 'free-play', label: 'Free Play' },
   { id: 'learn', label: 'Learn' },
   { id: 'practice', label: 'Practice' },
+  { id: 'pattern', label: 'Pattern' },
 ];
 
 export function ModeSelector() {

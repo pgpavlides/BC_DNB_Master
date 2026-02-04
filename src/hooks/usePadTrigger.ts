@@ -33,10 +33,14 @@ export function usePadTrigger() {
       }, 120);
       timeoutRefs.current.set(padId, timeout);
 
-      // Init audio on first interaction, then play
-      ensureAudio().then(() => {
+      // Play immediately if audio is ready, otherwise init first
+      if (audioEngine.isInitialized()) {
         audioEngine.triggerPad(padId);
-      });
+      } else {
+        ensureAudio().then(() => {
+          audioEngine.triggerPad(padId);
+        });
+      }
     },
     [triggerPad, releasePad, ensureAudio]
   );
