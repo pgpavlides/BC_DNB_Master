@@ -97,6 +97,265 @@
   color: #fff;
 }
 
+.muteBtn {
+  composes: btn;
+}
+
+.muteBtnActive {
+  background: #e74c3c;
+  border-color: #e74c3c;
+  color: #fff;
+}
+
 .tapBtn {
   composes: btn;
+}
+
+/* ─── Time-signature trigger button ─── */
+
+.timeSigAnchor {
+  position: relative;
+}
+
+.timeSigTrigger {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+  padding: 4px 10px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.06);
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 0.75rem;
+  font-weight: 700;
+  cursor: pointer;
+  line-height: 1.1;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.timeSigTrigger:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.timeSigTriggerNum,
+.timeSigTriggerDen {
+  font-variant-numeric: tabular-nums;
+}
+
+.timeSigTriggerDiv {
+  width: 14px;
+  height: 1px;
+  background: currentColor;
+  opacity: 0.5;
+  margin: 1px 0;
+}
+
+/* ─── Popup ─── */
+
+.timeSigPopup {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  right: 0;
+  z-index: 50;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 12px;
+  min-width: 210px;
+  background: #1e1e2e;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 10px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+}
+
+.popupSection {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.popupLabel {
+  font-size: 0.6rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+/* Signature buttons inside the popup */
+
+.popupSigRow {
+  display: flex;
+  gap: 4px;
+}
+
+.popupSigBtn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+  padding: 5px 10px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.04);
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  line-height: 1.1;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+
+.popupSigBtn:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.popupSigBtnActive {
+  background: #6c5ce7;
+  border-color: #6c5ce7;
+  color: #fff;
+}
+
+.popupSigNum,
+.popupSigDen {
+  font-variant-numeric: tabular-nums;
+}
+
+.popupSigDiv {
+  width: 12px;
+  height: 1px;
+  background: currentColor;
+  opacity: 0.5;
+  margin: 1px 0;
+}
+
+/* Grouping buttons inside the popup */
+
+.popupGroupRow {
+  display: flex;
+  gap: 4px;
+}
+
+.popupGroupBtn {
+  padding: 5px 10px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.04);
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.7rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+
+.popupGroupBtn:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.popupGroupBtnActive {
+  background: #6c5ce7;
+  border-color: #6c5ce7;
+  color: #fff;
+}
+
+/* ─── Volume group ─── */
+
+.volumeGroup {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.volumeLabel {
+  font-size: 0.65rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: rgba(255, 255, 255, 0.45);
+  min-width: 22px;
+}
+
+.volumeSlider {
+  flex: 1;
+  height: 4px;
+  -webkit-appearance: none;
+  appearance: none;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 2px;
+  outline: none;
+}
+
+.volumeSlider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #6c5ce7;
+  cursor: pointer;
+}
+
+.volumeSlider::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #6c5ce7;
+  cursor: pointer;
+  border: none;
+}
+
+.volumeValue {
+  font-size: 0.7rem;
+  font-variant-numeric: tabular-nums;
+  color: rgba(255, 255, 255, 0.55);
+  min-width: 24px;
+  text-align: right;
+}
+
+/* ─── Sound preset group ─── */
+
+.presetGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.presetLabel {
+  font-size: 0.65rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: rgba(255, 255, 255, 0.45);
+}
+
+.presetRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.presetBtn {
+  padding: 4px 8px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.04);
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.65rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+
+.presetBtn:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.presetBtnActive {
+  background: #6c5ce7;
+  border-color: #6c5ce7;
+  color: #fff;
 }

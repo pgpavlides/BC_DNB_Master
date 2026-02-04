@@ -1,3 +1,4 @@
+import { useState, useCallback } from 'react';
 import { useStore } from './store';
 import { PadGrid } from './components/PadGrid/PadGrid';
 import { MetronomeControls } from './components/Metronome/MetronomeControls';
@@ -9,12 +10,22 @@ import { TimingFeedback } from './components/Practice/TimingFeedback';
 import { PatternEditor, useEditorActions } from './components/PatternEditor/PatternEditor';
 import { EditorControls } from './components/PatternEditor/EditorControls';
 import { PatternLoaderModal } from './components/PatternEditor/PatternLoaderModal';
+import { SplashScreen } from './components/SplashScreen/SplashScreen';
 import styles from './components/Layout/Layout.module.css';
+
+const SKIP_SPLASH = import.meta.env.VITE_SKIP_SPLASH === 'true';
 
 export default function App() {
   const mode = useStore((s) => s.mode);
   const editorLoaderOpen = useStore((s) => s.editorLoaderOpen);
   const editorActions = useEditorActions();
+  const [splashDone, setSplashDone] = useState(SKIP_SPLASH);
+
+  const handleSplashEnter = useCallback(() => setSplashDone(true), []);
+
+  if (!splashDone) {
+    return <SplashScreen onEnter={handleSplashEnter} />;
+  }
 
   return (
     <div className={styles.app}>

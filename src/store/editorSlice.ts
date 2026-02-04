@@ -7,6 +7,7 @@ import {
   type StepGrid,
 } from '../utils/step-grid';
 import type { Pattern } from '../types/pattern';
+import type { MetronomeSlice } from './metronomeSlice';
 
 export interface EditorSlice {
   editorGrid: StepGrid;
@@ -21,6 +22,7 @@ export interface EditorSlice {
   editorClear: () => void;
   editorSetName: (name: string) => void;
   editorSetBars: (bars: number) => void;
+  editorSetBeatsPerBar: (beatsPerBar: number) => void;
   editorSetPreviewPlaying: (playing: boolean) => void;
   editorSetPreviewStep: (step: number) => void;
   editorLoadPattern: (pattern: Pattern) => void;
@@ -28,7 +30,12 @@ export interface EditorSlice {
   editorSetLoaderOpen: (open: boolean) => void;
 }
 
-export const createEditorSlice: StateCreator<EditorSlice> = (set, get) => ({
+export const createEditorSlice: StateCreator<
+  EditorSlice & MetronomeSlice,
+  [],
+  [],
+  EditorSlice
+> = (set, get) => ({
   editorGrid: createEmptyGrid(EDITOR_PAD_ORDER, 16),
   editorName: 'New Pattern',
   editorBars: 1,
@@ -52,17 +59,20 @@ export const createEditorSlice: StateCreator<EditorSlice> = (set, get) => ({
       return { editorGrid: newGrid };
     }),
 
-  editorClear: () =>
-    set((state) => ({
-      editorGrid: createEmptyGrid(EDITOR_PAD_ORDER, state.editorBars * 16),
-    })),
+  editorClear: () => {
+    const stepsPerBar = get().beatsPerMeasure * 16 / get().beatNoteValue;
+    return set((state) => ({
+      editorGrid: createEmptyGrid(EDITOR_PAD_ORDER, state.editorBars * stepsPerBar),
+    }));
+  },
 
   editorSetName: (name) => set({ editorName: name }),
 
-  editorSetBars: (bars) =>
-    set((state) => {
-      const oldSteps = state.editorBars * 16;
-      const newSteps = bars * 16;
+  editorSetBars: (bars) => {
+    const stepsPerBar = get().beatsPerMeasure * 16 / get().beatNoteValue;
+    return set((state) => {
+      const oldSteps = state.editorBars * stepsPerBar;
+      const newSteps = bars * stepsPerBar;
       const newGrid: StepGrid = new Map();
 
       for (const [padId, steps] of state.editorGrid) {
@@ -75,6 +85,23 @@ export const createEditorSlice: StateCreator<EditorSlice> = (set, get) => ({
       }
 
       return { editorBars: bars, editorGrid: newGrid };
+    });
+  },
+
+  editorSetBeatsPerBar: (beatsPerBar: number) =>
+    set((state) => {
+      const oldStepsPerBar = Math.round(
+        (state.editorGrid.values().next().value?.length ?? 16) / state.editorBars
+      );
+      const newStepsPerBar = beatsPerBar * 16 / get().beatNoteValue;
+      if (oldStepsPerBar === newStepsPerBar) return {};
+
+      const newTotalSteps = state.editorBars * newStepsPerBar;
+      const newGrid: StepGrid = new Map();
+      for (const [padId] of state.editorGrid) {
+        newGrid.set(padId, new Array(newTotalSteps).fill(false));
+      }
+      return { editorGrid: newGrid };
     }),
 
   editorSetPreviewPlaying: (playing) =>
@@ -89,7 +116,8 @@ export const createEditorSlice: StateCreator<EditorSlice> = (set, get) => ({
         pattern.events,
         EDITOR_PAD_ORDER,
         bars,
-        pattern.timeSignature[0]
+        pattern.timeSignature[0],
+        pattern.timeSignature[1]
       );
       return {
         editorGrid: grid,
@@ -104,13 +132,15 @@ export const createEditorSlice: StateCreator<EditorSlice> = (set, get) => ({
 
   editorBuildPattern: (bpm: number) => {
     const state = get();
-    const events = stepGridToEvents(state.editorGrid, state.editorBars);
+    const beatsPerMeasure = state.beatsPerMeasure;
+    const beatNoteValue = state.beatNoteValue;
+    const events = stepGridToEvents(state.editorGrid, state.editorBars, beatsPerMeasure, beatNoteValue);
     return {
       id: state.editorLoadedPatternId || crypto.randomUUID(),
       name: state.editorName,
       category: 'custom',
       bpm,
-      timeSignature: [4, 4] as [number, number],
+      timeSignature: [beatsPerMeasure, beatNoteValue] as [number, number],
       lengthInBars: state.editorBars,
       difficulty: 1,
       events,

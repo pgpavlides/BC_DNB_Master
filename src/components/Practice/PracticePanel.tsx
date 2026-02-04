@@ -17,6 +17,11 @@ export function PracticePanel() {
   const setBpm = useStore((s) => s.setBpm);
   const setMetronomeRunning = useStore((s) => s.setMetronomeRunning);
   const setCurrentBeat = useStore((s) => s.setCurrentBeat);
+  const metronomePreset = useStore((s) => s.metronomePreset);
+  const metronomeVolume = useStore((s) => s.metronomeVolume);
+  const beatNoteValue = useStore((s) => s.beatNoteValue);
+  const beatGrouping = useStore((s) => s.beatGrouping);
+  const isMetronomeMuted = useStore((s) => s.isMetronomeMuted);
   const animRef = useRef(false);
 
   const handleToggle = useCallback(() => {
@@ -42,11 +47,19 @@ export function PracticePanel() {
 
       setBpm(selectedPattern.bpm);
 
-      // Start metronome
+      // Start metronome with full settings
       audioEngine.onMetronomeBeat((beat) => {
         setCurrentBeat(beat);
       });
-      audioEngine.startMetronome(selectedPattern.bpm, selectedPattern.timeSignature[0]);
+      audioEngine.startMetronome(
+        selectedPattern.bpm,
+        selectedPattern.timeSignature[0],
+        metronomePreset,
+        metronomeVolume,
+        beatNoteValue,
+        beatGrouping,
+      );
+      if (isMetronomeMuted) audioEngine.muteMetronome();
       setMetronomeRunning(true);
 
       // Start pattern (no audio playback)
@@ -67,6 +80,11 @@ export function PracticePanel() {
     setBpm,
     setMetronomeRunning,
     setCurrentBeat,
+    metronomePreset,
+    metronomeVolume,
+    beatNoteValue,
+    beatGrouping,
+    isMetronomeMuted,
   ]);
 
   useEffect(() => {

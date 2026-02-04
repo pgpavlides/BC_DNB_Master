@@ -1,0 +1,191 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: #0f0f1a;
+  transition: opacity 0.6s ease, visibility 0.6s ease;
+}
+
+.overlayHidden {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+/* ─── Logo ─── */
+
+.logoWrapper {
+  position: relative;
+  width: 260px;
+  height: 260px;
+  animation: logoEnter 1s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes logoEnter {
+  0% {
+    opacity: 0;
+    transform: scale(0.7) translateY(20px);
+    filter: blur(12px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+    filter: blur(0);
+  }
+}
+
+.logo {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  border-radius: 50%;
+  position: relative;
+  z-index: 2;
+}
+
+/* Glow ring behind the logo */
+.logoWrapper::before {
+  content: '';
+  position: absolute;
+  inset: -18px;
+  border-radius: 50%;
+  background: conic-gradient(
+    from 0deg,
+    rgba(108, 92, 231, 0.45),
+    rgba(0, 206, 209, 0.35),
+    rgba(108, 92, 231, 0.45)
+  );
+  filter: blur(28px);
+  animation: glowSpin 4s linear infinite;
+  z-index: 0;
+}
+
+@keyframes glowSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Subtle pulse ring */
+.logoWrapper::after {
+  content: '';
+  position: absolute;
+  inset: -6px;
+  border-radius: 50%;
+  border: 2px solid rgba(108, 92, 231, 0.25);
+  animation: ringPulse 2.4s ease-in-out infinite;
+  z-index: 1;
+}
+
+@keyframes ringPulse {
+  0%, 100% {
+    opacity: 0.3;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.7;
+    transform: scale(1.04);
+  }
+}
+
+/* ─── Title & description ─── */
+
+.title {
+  margin-top: 32px;
+  font-size: 1.6rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  color: #fff;
+  text-align: center;
+  animation: textEnter 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.25s both;
+}
+
+.description {
+  margin-top: 8px;
+  max-width: 340px;
+  font-size: 0.85rem;
+  font-weight: 400;
+  line-height: 1.5;
+  color: rgba(255, 255, 255, 0.5);
+  text-align: center;
+  animation: textEnter 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.35s both;
+}
+
+@keyframes textEnter {
+  0% {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ─── Enter button ─── */
+
+.enterBtn {
+  margin-top: 48px;
+  padding: 14px 48px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #fff;
+  background: linear-gradient(135deg, #6c5ce7 0%, #4834d4 100%);
+  border: none;
+  border-radius: 40px;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  animation: btnEnter 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.45s both;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.enterBtn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 32px rgba(108, 92, 231, 0.45);
+}
+
+.enterBtn:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 12px rgba(108, 92, 231, 0.3);
+}
+
+@keyframes btnEnter {
+  0% {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Shimmer sweep across the button */
+.enterBtn::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.15) 50%,
+    transparent 100%
+  );
+  animation: shimmer 3s ease-in-out infinite 1.2s;
+}
+
+@keyframes shimmer {
+  0%   { left: -100%; }
+  40%  { left: 100%; }
+  100% { left: 100%; }
+}

@@ -26,11 +26,12 @@ export function createEmptyGrid(
 export function stepGridToEvents(
   grid: StepGrid,
   bars: number,
-  beatsPerBar = 4
+  beatsPerBar = 4,
+  beatNoteValue = 4
 ): PatternEvent[] {
   const events: PatternEvent[] = [];
-  const stepsPerBeat = 4; // 16th-note resolution
-  const stepsPerBar = beatsPerBar * stepsPerBeat;
+  const sixteenthsPerBeat = 16 / beatNoteValue;
+  const stepsPerBar = beatsPerBar * sixteenthsPerBeat;
   const totalSteps = bars * stepsPerBar;
 
   for (const [padId, steps] of grid) {
@@ -39,8 +40,8 @@ export function stepGridToEvents(
 
       const bar = Math.floor(i / stepsPerBar);
       const remainder = i % stepsPerBar;
-      const quarter = Math.floor(remainder / stepsPerBeat);
-      const sixteenth = remainder % stepsPerBeat;
+      const quarter = Math.floor(remainder / 4);
+      const sixteenth = remainder % 4;
 
       events.push({
         time: `${bar}:${quarter}:${sixteenth}`,
@@ -59,10 +60,11 @@ export function eventsToStepGrid(
   events: PatternEvent[],
   padIds: readonly number[],
   bars: number,
-  beatsPerBar = 4
+  beatsPerBar = 4,
+  beatNoteValue = 4
 ): StepGrid {
-  const stepsPerBeat = 4;
-  const stepsPerBar = beatsPerBar * stepsPerBeat;
+  const sixteenthsPerBeat = 16 / beatNoteValue;
+  const stepsPerBar = beatsPerBar * sixteenthsPerBeat;
   const totalSteps = bars * stepsPerBar;
   const grid = createEmptyGrid(padIds, totalSteps);
 
@@ -74,7 +76,7 @@ export function eventsToStepGrid(
     const quarter = parts[1] || 0;
     const sixteenth = parts[2] || 0;
 
-    const stepIndex = bar * stepsPerBar + quarter * stepsPerBeat + sixteenth;
+    const stepIndex = bar * stepsPerBar + quarter * 4 + sixteenth;
     if (stepIndex < totalSteps) {
       grid.get(event.padId)![stepIndex] = true;
     }

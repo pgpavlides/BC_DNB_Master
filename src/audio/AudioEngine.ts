@@ -71,9 +71,9 @@ class AudioEngine {
   }
 
   // Metronome
-  startMetronome(bpm: number, beatsPerMeasure = 4): void {
+  startMetronome(bpm: number, beatsPerMeasure = 4, preset?: string, volume?: number, noteValue?: number, grouping?: number[]): void {
     if (!Tone) return;
-    this.metronome?.start(bpm, beatsPerMeasure);
+    this.metronome?.start(bpm, beatsPerMeasure, preset, volume, noteValue, grouping);
     Tone.getTransport().start();
     this._isPlaying = true;
   }
@@ -90,6 +90,22 @@ class AudioEngine {
 
   setMetronomeBpm(bpm: number): void {
     this.metronome?.setBpm(bpm);
+  }
+
+  setMetronomeVolume(vol: number): void {
+    this.metronome?.setVolume(vol);
+  }
+
+  setMetronomePreset(preset: string): void {
+    this.metronome?.setPreset(preset);
+  }
+
+  muteMetronome(): void {
+    this.metronome?.mute();
+  }
+
+  unmuteMetronome(): void {
+    this.metronome?.unmute();
   }
 
   onMetronomeBeat(callback: (beat: number) => void): void {

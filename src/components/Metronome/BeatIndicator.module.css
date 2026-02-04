@@ -1,7 +1,7 @@
 .container {
   display: flex;
   justify-content: center;
-  gap: 10px;
+  gap: 6px;
   padding: 8px 0;
 }
 
@@ -13,10 +13,27 @@
   transition: background 0.08s ease, transform 0.08s ease, box-shadow 0.08s ease;
 }
 
+/* Extra left margin to visually separate sub-groups */
+.groupGap {
+  margin-left: 8px;
+}
+
+/* Idle state for group-accent dots: slightly brighter ring */
+.dotAccentIdle {
+  background: rgba(255, 255, 255, 0.22);
+}
+
 .dotActive {
   background: #6c5ce7;
-  transform: scale(1.4);
-  box-shadow: 0 0 10px #6c5ce7;
+  transform: scale(1.3);
+  box-shadow: 0 0 8px #6c5ce7;
+}
+
+/* Group-accent beat when active — orange to distinguish from regular beats */
+.dotAccent {
+  background: #fdcb6e;
+  transform: scale(1.45);
+  box-shadow: 0 0 10px #fdcb6e;
 }
 
 .dotDownbeat {

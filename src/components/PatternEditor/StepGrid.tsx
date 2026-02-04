@@ -10,8 +10,11 @@ export function StepGrid() {
   const bars = useStore((s) => s.editorBars);
   const previewStep = useStore((s) => s.editorPreviewStep);
   const toggleStep = useStore((s) => s.editorToggleStep);
+  const beatsPerMeasure = useStore((s) => s.beatsPerMeasure);
+  const beatNoteValue = useStore((s) => s.beatNoteValue);
 
-  const totalSteps = bars * 16;
+  const stepsPerBar = beatsPerMeasure * 16 / beatNoteValue;
+  const totalSteps = bars * stepsPerBar;
 
   const handleToggle = useCallback(
     (padId: number, step: number) => {
@@ -26,14 +29,14 @@ export function StepGrid() {
   beatMarkers.push(<div key="label-spacer" className={styles.labelSpacer} />);
   for (let i = 0; i < totalSteps; i++) {
     const isBeatStart = i % 4 === 0;
-    const isBarStart = i % 16 === 0;
+    const isBarStart = i % stepsPerBar === 0;
     let markerClass = styles.beatMarker;
     if (isBarStart) markerClass += ` ${styles.beatMarkerBar}`;
     else if (isBeatStart) markerClass += ` ${styles.beatMarkerBeat}`;
 
     beatMarkers.push(
       <div key={`marker-${i}`} className={markerClass}>
-        {isBeatStart ? Math.floor(i / 4) + 1 : ''}
+        {isBeatStart ? Math.floor((i % stepsPerBar) / 4) + 1 : ''}
       </div>
     );
   }

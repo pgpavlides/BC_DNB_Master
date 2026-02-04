@@ -13,6 +13,13 @@ export function PatternTimeline() {
   const clearAllHighlights = useStore((s) => s.clearAllHighlights);
   const mode = useStore((s) => s.mode);
   const setBpm = useStore((s) => s.setBpm);
+  const setMetronomeRunning = useStore((s) => s.setMetronomeRunning);
+  const setCurrentBeat = useStore((s) => s.setCurrentBeat);
+  const metronomePreset = useStore((s) => s.metronomePreset);
+  const metronomeVolume = useStore((s) => s.metronomeVolume);
+  const beatNoteValue = useStore((s) => s.beatNoteValue);
+  const beatGrouping = useStore((s) => s.beatGrouping);
+  const isMetronomeMuted = useStore((s) => s.isMetronomeMuted);
   const [cursorPos, setCursorPos] = useState(0);
   const [activeSteps, setActiveSteps] = useState(new Set<number>());
   const animFrameRef = useRef<number>(0);
@@ -22,6 +29,8 @@ export function PatternTimeline() {
 
     if (isPatternPlaying) {
       audioEngine.stopPattern();
+      audioEngine.stopMetronome();
+      setMetronomeRunning(false);
       setPatternPlaying(false);
       clearAllHighlights();
       setCursorPos(0);
@@ -56,6 +65,20 @@ export function PatternTimeline() {
       }
 
       setBpm(selectedPattern.bpm);
+
+      // Start metronome alongside pattern
+      audioEngine.onMetronomeBeat((beat) => setCurrentBeat(beat));
+      audioEngine.startMetronome(
+        selectedPattern.bpm,
+        selectedPattern.timeSignature[0],
+        metronomePreset,
+        metronomeVolume,
+        beatNoteValue,
+        beatGrouping,
+      );
+      if (isMetronomeMuted) audioEngine.muteMetronome();
+      setMetronomeRunning(true);
+
       audioEngine.startPattern(mode === 'learn');
       setPatternPlaying(true);
 
@@ -82,6 +105,13 @@ export function PatternTimeline() {
     clearHighlight,
     mode,
     setBpm,
+    setMetronomeRunning,
+    setCurrentBeat,
+    metronomePreset,
+    metronomeVolume,
+    beatNoteValue,
+    beatGrouping,
+    isMetronomeMuted,
   ]);
 
   useEffect(() => {
