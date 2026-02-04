@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import type { PadConfig } from '../../types/pad';
 import { PAD_TO_KEY } from '../../constants/keyboard-map';
 import { useStore } from '../../store';
@@ -22,7 +23,7 @@ export function Pad({ config, isActive, isHighlighted, onTrigger }: PadProps) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [menuPos, setMenuPos] = useState({ x: 0, y: 0 });
   const menuRef = useRef<HTMLDivElement>(null);
-  const padRef = useRef<HTMLButtonElement>(null);
+  const padRef = useRef<HTMLDivElement>(null);
 
   const padColor = useStore((s) => s.padColors[config.id]) ?? config.color;
   const setPadColor = useStore((s) => s.setPadColor);
@@ -43,13 +44,7 @@ export function Pad({ config, isActive, isHighlighted, onTrigger }: PadProps) {
       e.preventDefault();
       e.stopPropagation();
       if (disabled) return;
-      const rect = padRef.current?.getBoundingClientRect();
-      if (rect) {
-        setMenuPos({
-          x: e.clientX - rect.left,
-          y: e.clientY - rect.top,
-        });
-      }
+      setMenuPos({ x: e.clientX, y: e.clientY });
       setMenuOpen(true);
     },
     [disabled]
@@ -91,26 +86,30 @@ export function Pad({ config, isActive, isHighlighted, onTrigger }: PadProps) {
       : `color-mix(in srgb, ${padColor} 60%, #1a1a2e)`;
 
   return (
-    <button
-      ref={padRef}
-      className={classNames}
-      style={disabled ? undefined : {
-        backgroundColor: bgColor,
-        color: padColor,
-        boxShadow: isActive
-          ? `0 0 24px 4px ${padColor}80, inset 0 0 20px rgba(255,255,255,0.2)`
-          : isHighlighted
-            ? `0 0 20px 4px ${padColor}60`
-            : `inset 0 -2px 4px rgba(0,0,0,0.3)`,
-      }}
-      onPointerDown={handlePointerDown}
-      onContextMenu={handleContextMenu}
-    >
-      <span className={styles.padNumber}>{config.id + 1}</span>
-      <span className={styles.padName}>{config.shortName}</span>
-      <span className={styles.padKey}>{PAD_TO_KEY[config.id]}</span>
+    <>
+      <div
+        ref={padRef}
+        role="button"
+        tabIndex={disabled ? -1 : 0}
+        className={classNames}
+        style={disabled ? undefined : {
+          backgroundColor: bgColor,
+          color: padColor,
+          boxShadow: isActive
+            ? `0 0 24px 4px ${padColor}80, inset 0 0 20px rgba(255,255,255,0.2)`
+            : isHighlighted
+              ? `0 0 20px 4px ${padColor}60`
+              : `inset 0 -2px 4px rgba(0,0,0,0.3)`,
+        }}
+        onPointerDown={handlePointerDown}
+        onContextMenu={handleContextMenu}
+      >
+        <span className={styles.padNumber}>{config.id + 1}</span>
+        <span className={styles.padName}>{config.shortName}</span>
+        <span className={styles.padKey}>{PAD_TO_KEY[config.id]}</span>
+      </div>
 
-      {menuOpen && (
+      {menuOpen && createPortal(
         <div
           ref={menuRef}
           className={styles.colorMenu}
@@ -125,8 +124,9 @@ export function Pad({ config, isActive, isHighlighted, onTrigger }: PadProps) {
               onClick={() => handleColorPick(color)}
             />
           ))}
-        </div>
+        </div>,
+        document.body
       )}
-    </button>
+    </>
   );
 }

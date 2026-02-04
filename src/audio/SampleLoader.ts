@@ -9,31 +9,27 @@ export class SampleLoader {
     if (this.loaded) return;
 
     // Only load pads that have a sample file assigned
-    const loadPromises = PAD_CONFIGS
-      .filter((pad) => pad.sampleFile)
-      .map(async (pad) => {
-        try {
-          const url = `/samples/${pad.sampleFile}`;
-          const response = await fetch(url, { method: 'HEAD' });
-          if (response.ok) {
-            const player = new Tone.Player({
-              url,
-            }).toDestination();
+    const padsWithSamples = PAD_CONFIGS.filter((pad) => pad.sampleFile);
+
+    const loadPromises = padsWithSamples.map((pad) => {
+      return new Promise<void>((resolve) => {
+        // Encode spaces in filenames
+        const url = `/samples/${pad.sampleFile.split('/').map(encodeURIComponent).join('/')}`;
+        const player = new Tone.Player({
+          url,
+          onload: () => {
             this.players.set(pad.id, player);
-          }
-        } catch {
-          // File not available — pad stays unloaded
-        }
+            resolve();
+          },
+          onerror: () => {
+            console.warn(`Failed to load sample: ${pad.sampleFile}`);
+            resolve();
+          },
+        }).toDestination();
       });
+    });
 
     await Promise.all(loadPromises);
-
-    try {
-      await Tone.loaded();
-    } catch {
-      // Some players may have failed
-    }
-
     this.loaded = true;
   }
 

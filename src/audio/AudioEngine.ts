@@ -1,8 +1,17 @@
-import * as Tone from 'tone';
-import { SampleLoader } from './SampleLoader';
-import { Metronome } from './Metronome';
-import { PatternPlayer } from './PatternPlayer';
 import type { Pattern, PatternEvent } from '../types/pattern';
+import type { SampleLoader } from './SampleLoader';
+import type { Metronome } from './Metronome';
+import type { PatternPlayer } from './PatternPlayer';
+
+// Tone.js is loaded dynamically to avoid creating an AudioContext before user gesture
+let Tone: typeof import('tone') | null = null;
+
+async function getTone() {
+  if (!Tone) {
+    Tone = await import('tone');
+  }
+  return Tone;
+}
 
 class AudioEngine {
   private sampleLoader: SampleLoader | null = null;
@@ -14,7 +23,13 @@ class AudioEngine {
   async init(): Promise<void> {
     if (this.initialized) return;
 
-    await Tone.start();
+    const T = await getTone();
+    await T.start();
+
+    // Dynamic imports so Tone.js module-level code only runs after user gesture
+    const { SampleLoader } = await import('./SampleLoader');
+    const { Metronome } = await import('./Metronome');
+    const { PatternPlayer } = await import('./PatternPlayer');
 
     this.sampleLoader = new SampleLoader();
     this.metronome = new Metronome();
@@ -38,12 +53,14 @@ class AudioEngine {
 
   // Metronome
   startMetronome(bpm: number, beatsPerMeasure = 4): void {
+    if (!Tone) return;
     this.metronome?.start(bpm, beatsPerMeasure);
     Tone.getTransport().start();
     this._isPlaying = true;
   }
 
   stopMetronome(): void {
+    if (!Tone) return;
     this.metronome?.stop();
     if (!this.patternPlayer?.getPattern()) {
       Tone.getTransport().stop();
@@ -66,7 +83,7 @@ class AudioEngine {
   }
 
   startPattern(playAudio = true): void {
-    if (!this.patternPlayer) return;
+    if (!Tone || !this.patternPlayer) return;
     if (playAudio) {
       this.patternPlayer.onEvent((event: PatternEvent) => {
         this.triggerPad(event.padId);
@@ -78,6 +95,7 @@ class AudioEngine {
   }
 
   stopPattern(): void {
+    if (!Tone) return;
     this.patternPlayer?.stop();
     Tone.getTransport().stop();
     Tone.getTransport().position = 0;
@@ -100,10 +118,12 @@ class AudioEngine {
   }
 
   getCurrentTime(): number {
+    if (!Tone) return 0;
     return Tone.getContext().currentTime;
   }
 
   getTransportPosition(): number {
+    if (!Tone) return 0;
     return Tone.getTransport().seconds;
   }
 
@@ -115,5 +135,5 @@ class AudioEngine {
   }
 }
 
-// Singleton — no Tone.js objects created until init() is called
+// Singleton — nothing from Tone.js is loaded until init() is called on first user gesture
 export const audioEngine = new AudioEngine();
