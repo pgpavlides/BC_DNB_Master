@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef } from 'react';
 import { useStore } from '../../store';
 import { audioEngine } from '../../audio/AudioEngine';
 import { EDITOR_PAD_ORDER } from '../../utils/step-grid';
+import { patternToMidi } from '../../utils/midi-export';
 import type { Pattern } from '../../types/pattern';
 import { StepGrid } from './StepGrid';
 import styles from './PatternEditor.module.css';
@@ -192,5 +193,19 @@ export function useEditorActions() {
     }
   }, [editorBuildPattern, bpm, patterns, addPattern, updatePattern]);
 
-  return { handlePlay, handleStop, handleSave, isPlaying };
+  const handleExportMidi = useCallback(() => {
+    const pattern = editorBuildPattern(bpm);
+    const midiBytes = patternToMidi(pattern);
+    const blob = new Blob([midiBytes], { type: 'audio/midi' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${pattern.name || 'pattern'}.mid`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }, [editorBuildPattern, bpm]);
+
+  return { handlePlay, handleStop, handleSave, handleExportMidi, isPlaying };
 }

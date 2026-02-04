@@ -6,10 +6,11 @@ interface EditorControlsProps {
   onPlay: () => void;
   onStop: () => void;
   onSave: () => void;
+  onExportMidi: () => void;
   isPlaying: boolean;
 }
 
-export function EditorControls({ onPlay, onStop, onSave, isPlaying }: EditorControlsProps) {
+export function EditorControls({ onPlay, onStop, onSave, onExportMidi, isPlaying }: EditorControlsProps) {
   const name = useStore((s) => s.editorName);
   const bars = useStore((s) => s.editorBars);
   const setName = useStore((s) => s.editorSetName);
@@ -57,6 +58,9 @@ export function EditorControls({ onPlay, onStop, onSave, isPlaying }: EditorCont
         </button>
         <button className={styles.saveBtn} onClick={onSave}>
           Save
+        </button>
+        <button className={styles.exportBtn} onClick={onExportMidi}>
+          Export MIDI
         </button>
       </div>
 

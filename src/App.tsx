@@ -61,6 +61,7 @@ export default function App() {
                 onPlay={editorActions.handlePlay}
                 onStop={editorActions.handleStop}
                 onSave={editorActions.handleSave}
+                onExportMidi={editorActions.handleExportMidi}
                 isPlaying={editorActions.isPlaying}
               />
             </div>
