@@ -1,34 +1,37 @@
 import * as Tone from 'tone';
 
 export class Metronome {
-  private synth: Tone.Synth;
+  private synth: Tone.Synth | null = null;
   private loop: Tone.Loop | null = null;
   private beatCallback: ((beat: number) => void) | null = null;
   private beatsPerMeasure = 4;
 
-  constructor() {
-    this.synth = new Tone.Synth({
-      oscillator: { type: 'triangle' },
-      envelope: { attack: 0.001, decay: 0.1, sustain: 0, release: 0.05 },
-      volume: -10,
-    }).toDestination();
+  private ensureSynth(): Tone.Synth {
+    if (!this.synth) {
+      this.synth = new Tone.Synth({
+        oscillator: { type: 'triangle' },
+        envelope: { attack: 0.001, decay: 0.1, sustain: 0, release: 0.05 },
+        volume: -10,
+      }).toDestination();
+    }
+    return this.synth;
   }
 
   start(bpm: number, beatsPerMeasure = 4): void {
     this.stop();
     this.beatsPerMeasure = beatsPerMeasure;
+    const synth = this.ensureSynth();
 
     Tone.getTransport().bpm.value = bpm;
 
     this.loop = new Tone.Loop((time) => {
-      // Derive beat from transport position so it's always correct
       const posSeconds = Tone.getTransport().seconds;
       const secondsPerBeat = 60 / Tone.getTransport().bpm.value;
       const totalBeats = Math.round(posSeconds / secondsPerBeat);
       const beat = totalBeats % this.beatsPerMeasure;
 
       const isDownbeat = beat === 0;
-      this.synth.triggerAttackRelease(
+      synth.triggerAttackRelease(
         isDownbeat ? 'C6' : 'C5',
         '32n',
         time,
@@ -61,6 +64,9 @@ export class Metronome {
 
   dispose(): void {
     this.stop();
-    this.synth.dispose();
+    if (this.synth) {
+      this.synth.dispose();
+      this.synth = null;
+    }
   }
 }
