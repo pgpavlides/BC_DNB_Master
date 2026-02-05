@@ -48,7 +48,7 @@ export class Metronome {
       }).toDestination();
     } else {
       this.synth = new Tone.Synth({
-        oscillator: { type: preset.oscillatorType as Tone.ToneOscillatorType },
+        oscillator: { type: preset.oscillatorType as "sine" | "square" | "triangle" | "sawtooth" },
         envelope: preset.envelope,
         volume: dbVolume,
       }).toDestination();

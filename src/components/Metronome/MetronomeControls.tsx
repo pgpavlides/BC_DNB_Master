@@ -23,7 +23,6 @@ export function MetronomeControls() {
   const bpm = useStore((s) => s.bpm);
   const setBpm = useStore((s) => s.setBpm);
   const isRunning = useStore((s) => s.isMetronomeRunning);
-  const setRunning = useStore((s) => s.setMetronomeRunning);
   const setCurrentBeat = useStore((s) => s.setCurrentBeat);
   const beatsPerMeasure = useStore((s) => s.beatsPerMeasure);
   const setBeatsPerMeasure = useStore((s) => s.setBeatsPerMeasure);

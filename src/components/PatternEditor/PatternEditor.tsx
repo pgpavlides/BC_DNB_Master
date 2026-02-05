@@ -197,7 +197,7 @@ export function useEditorActions() {
   const handleExportMidi = useCallback(() => {
     const pattern = editorBuildPattern(bpm);
     const midiBytes = patternToMidi(pattern);
-    const blob = new Blob([midiBytes], { type: 'audio/midi' });
+    const blob = new Blob([midiBytes.buffer as ArrayBuffer], { type: 'audio/midi' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;

@@ -45,21 +45,6 @@ function vlq(value: number): number[] {
   return bytes;
 }
 
-/** Convert "bars:quarters:sixteenths" to absolute ticks */
-function timeToTicks(time: string, ticksPerQuarter: number): number {
-  const parts = time.split(':').map(Number);
-  const bar = parts[0] || 0;
-  const quarter = parts[1] || 0;
-  const sixteenth = parts[2] || 0;
-  // Each quarter = ticksPerQuarter ticks
-  // Each sixteenth = ticksPerQuarter / 4 ticks
-  // Each bar = (quarters in time string count) — but bars are expressed
-  // relative to quarter-note groupings already in the pattern.
-  // In this format: bar * (stepsPerBar in quarters) + quarter + sixteenth/4
-  // The time string uses quarter notes as the middle unit, so:
-  return (bar * 4 + quarter) * ticksPerQuarter + sixteenth * (ticksPerQuarter / 4);
-}
-
 /**
  * Build a standard MIDI file (Format 0) from a Pattern.
  * Returns raw bytes suitable for saving as .mid.
@@ -67,13 +52,6 @@ function timeToTicks(time: string, ticksPerQuarter: number): number {
 export function patternToMidi(pattern: Pattern): Uint8Array {
   const [beatsPerBar, beatNoteValue] = pattern.timeSignature;
   const ticksPerQuarter = TICKS_PER_QUARTER;
-
-  // Compute ticks per bar correctly for the time signature
-  // beatsPerBar beats of (1/beatNoteValue) each
-  // One quarter note = ticksPerQuarter ticks
-  // One beat = (4 / beatNoteValue) quarter notes
-  const ticksPerBeat = (4 / beatNoteValue) * ticksPerQuarter;
-  const ticksPerBar = beatsPerBar * ticksPerBeat;
 
   // --- Build track data ---
   const track: number[] = [];
